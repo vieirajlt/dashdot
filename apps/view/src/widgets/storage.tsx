@@ -93,18 +93,19 @@ export const StorageChart: FC<StorageChartProps> = ({
   const layoutNoVirtual = shownData.filter(l => !l.virtual);
 
   const totalSize = layoutNoVirtual.reduce((acc, s) => (acc = acc + s.size), 0);
-  const totalUsed =
+  const totalAvailable =
     load
       ?.slice(0, layoutNoVirtual.length)
       .reduce((acc, curr) => acc + curr, 0) ?? 0;
-  const totalAvailable = Math.max(0, totalSize - totalUsed);
+  const totalUsed = Math.max(0, totalSize - totalAvailable);
 
   const usageArr = useMemo(() => {
     if (!multiView) return [];
 
     return shownData.map((d, i) => {
-      const used = load?.[i] ?? 0;
-      const available = d.size - used;
+      const available = load?.[i] ?? 0;
+      const used = d.size - available;
+      console.log("d", d)
       const realPercent = used / d.size,
         usedPercent = Math.min(realPercent, 1);
 

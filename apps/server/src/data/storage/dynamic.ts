@@ -8,6 +8,7 @@ type Block = si.Systeminformation.BlockDevicesData;
 type Size = si.Systeminformation.FsSizeData;
 
 const unwrapUsed = (size?: Size) => size?.used ?? 0;
+const unwrapAvailable = (size?: Size) => size?.available ?? 0;
 
 export class DynamicStorageMapper {
   private validSizes: Size[];
@@ -85,7 +86,7 @@ export class DynamicStorageMapper {
   // Get sizes of all unmapped sizes, including the host
   // because this function will only run, if there is no explicit host
   private getSizesOfAllUnmapped() {
-    const hostMountUsed = unwrapUsed(
+    const hostMountUsed = unwrapAvailable(
       this.validSizes.find(
         ({ mount, type }) => type !== 'squashfs' && this.isRootMount(mount)
       ) ?? this.sizes.find(({ mount }) => mount === '/')
@@ -107,7 +108,7 @@ export class DynamicStorageMapper {
       d => d.mount === fromHost('/')
     );
     return hasNoExplicitMount
-      ? unwrapUsed(this.validSizes.find(({ mount }) => mount === fromHost('/')))
+      ? unwrapAvailable(this.validSizes.find(({ mount }) => mount === fromHost('/')))
       : 0;
   }
 
@@ -116,7 +117,7 @@ export class DynamicStorageMapper {
     return deviceBlocks.reduce(
       (acc, curr) =>
         acc +
-        unwrapUsed(
+        unwrapAvailable(
           this.validSizes.find(
             ({ mount }) =>
               mount &&
